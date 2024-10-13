@@ -1,8 +1,8 @@
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 
-// const token = 'MTI5NTAxNDE0MDUxMDg2MzQyMQ.G42FZd.my1OqLZa2osXqdiIUiEqkhVg3KmaDSVJiyhPlQ'; // pravi
-const token = "MTI4MDYyMDk1NjM1NTY1Nzg1MQ.G9tOOj.h2PicraEYyte2Gjzne2-vJYstsbwnjNbLCkqNg"; // test
+const token = 'MTI5NTAxNDE0MDUxMDg2MzQyMQ.G42FZd.my1OqLZa2osXqdiIUiEqkhVg3KmaDSVJiyhPlQ'; // pravi
+// const token = "MTI4MDYyMDk1NjM1NTY1Nzg1MQ.G9tOOj.h2PicraEYyte2Gjzne2-vJYstsbwnjNbLCkqNg"; // test
 
 const client = new Client({
     intents: [
