@@ -1,7 +1,8 @@
-const { Client, GatewayIntentBits } = require('discord.js');
-const { EmbedBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const fs = require('fs');
 
-const token = "MTI5NTAxNDE0MDUxMDg2MzQyMQ.G42FZd.my1OqLZa2osXqdiIUiEqkhVg3KmaDSVJiyhPlQ";
+// const token = 'MTI5NTAxNDE0MDUxMDg2MzQyMQ.G42FZd.my1OqLZa2osXqdiIUiEqkhVg3KmaDSVJiyhPlQ'; // pravi
+const token = "MTI4MDYyMDk1NjM1NTY1Nzg1MQ.G9tOOj.h2PicraEYyte2Gjzne2-vJYstsbwnjNbLCkqNg"; // test
 
 const client = new Client({
     intents: [
@@ -11,8 +12,44 @@ const client = new Client({
     ]
 });
 
-client.once('ready', () => {
-    console.log(`Logged in as ${client.user.tag}`);
+client.commands = new Map(); // Inicijalizacija mape za komande
+
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+
+    // Proveri da li je command.data definisan
+    if (command.data) {
+        console.log(`Registering command: ${command.data.name}`);
+        client.commands.set(command.data.name, command);
+    } else {
+        console.error(`Command in ${file} is missing data property`);
+    }
+}
+
+client.once('ready', async () => {
+    console.log('\x1b[36m%s\x1b[0m', `🚀 Logged in as ${client.user.tag}`);
+    console.log('\x1b[36m%s\x1b[0m', `🔍 ${client.user.tag} is currently in servers.`);
+
+    // Registracija svih Slash komandi
+    await client.application.commands.set(Array.from(client.commands.values()).map(command => command.data));
+    console.log('\x1b[36m%s\x1b[0m', '📜 Slash commands registered successfully!');
+});
+
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return;
+
+    const { commandName, options } = interaction;
+
+    if (!client.commands.has(commandName)) return;
+
+    try {
+        await client.commands.get(commandName).execute(interaction, options);
+    } catch (error) {
+        console.error('\x1b[31m%s\x1b[0m', '❌ There was an error executing that command:', error);
+        await interaction.reply('There was an error executing that command.');
+    }
 });
 
 client.on('messageCreate', async (message) => {
